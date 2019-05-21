@@ -1,7 +1,11 @@
 import asyncio
 import socketio
-from utils import camel_case_to_snake_case
-from manual import part_manual
+from .utils import camel_case_to_snake_case
+import json
+import os
+
+with open(os.path.join(os.path.dirname(__file__), './robot-specification.json')) as json_file:
+    robot_specification = json.load(json_file)
 
 loop = asyncio.get_event_loop()
 
@@ -12,7 +16,7 @@ class Robot:
         loop.run_until_complete(self.__sio.connect('http://localhost:1337'))
 
         for part_conf in configuration:
-            setattr(self, part_conf['name'], Part(self.__emit, part_conf['name'], part_conf["type"], part_conf["port"]))
+            setattr(self, part_conf['name'], Part(self.__emit, part_conf['name'], part_conf["type"]))
 
         @self.__sio.on('recieve data')
         def on_message(data):
@@ -23,13 +27,13 @@ class Robot:
         await self.__sio.emit('send to vehicle', data=request_object)
 
 class Part:
-    def __init__(self, emit_func, part_name, part_type, port):
+    def __init__(self, emit_func, part_name, part_type):
         self.__emit = emit_func
         self.__event = asyncio.Event()
         self.__event.set()
         self.__socket_response = None
 
-        for method_name, method_spec in part_manual[part_type]["methods"].items():
+        for method_name, method_spec in robot_specification[part_type]["methods"].items():
             method_to_mount = self.__generate_method_to_mount(part_name, method_name, method_spec)
             setattr(self, camel_case_to_snake_case(method_name), method_to_mount)
 
@@ -71,23 +75,4 @@ class Part:
 
         return method_to_mount
 
-
-conf = [
-    {"name": "csl", "type": "color", "port": 1},
-    {"name": "csr", "type": "color", "port": 3},
-    {"name": "us", "type": "ultrasonic", "port": 7},
-    {"name": "cs", "type": "controlSystem", "port": 432}
-]
-
-
-
-robot = Robot(conf)
-# print(robot.csl.get_color_name())
-# print(robot.csr.get_color_name())
-# print(robot.us.get_distance())
-# print(robot.csl.get_color_name())
-# print(robot.csr.get_color_name())
-print(robot.us.get_distance())
-robot.cs.set_speed(50, 50)
-# robot.cs.brake("both")
 

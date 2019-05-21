@@ -1,4 +1,4 @@
-part_manual = {
+{
     "color": {
         "methods": {
             "GetColorName": {
@@ -28,7 +28,7 @@ part_manual = {
                         "type": "float"
                     }
                 ],
-                "return": None
+                "return": null
             },
             "SetSpeed": {
                 "arguments": [
@@ -41,16 +41,16 @@ part_manual = {
                         "type": "float"
                     }
                 ],
-                "return": None
+                "return": null
             },
-            "Brake": {
+            "Stop": {
                 "arguments": [
                     {
                         "name": "whichWheel",
                         "type": "string"
                     }
                 ],
-                "return": None
+                "return": null
             }
         }
     },
@@ -70,7 +70,7 @@ part_manual = {
             },
             "Reset": {
                 "arguments": [],
-                "return": None
+                "return": null
             }
         }
     },
@@ -96,7 +96,7 @@ part_manual = {
                         "type": "float"
                     }
                 ],
-                "return": None
+                "return": null
             },
             "Rotate": {
                 "arguments": [
@@ -105,7 +105,7 @@ part_manual = {
                         "type": "boolean"
                     }
                 ],
-                "return": None
+                "return": null
             },
             "Lift": {
                 "arguments": [
@@ -114,7 +114,7 @@ part_manual = {
                         "type": "boolean"
                     }
                 ],
-                "return": None
+                "return": null
             },
             "GetCooldown": {
                 "arguments": [],
