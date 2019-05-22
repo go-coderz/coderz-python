@@ -13,3 +13,5 @@ To activate source `source env/bin/activate`
 To install dependencies type in Venv `pip3 install -r requirements.txt`
 
 Deactivate just type `deactivate`
+
+## Dont forget to set player me as in multiplayer. Not `me`.
