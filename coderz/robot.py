@@ -11,12 +11,12 @@ loop = asyncio.get_event_loop()
 
 class Robot:
     # generate a robot object with an api for each of the robot's parts.
-    def __init__(self, configuration):
+    def __init__(self, configuration, robot_name):
         self.__sio = socketio.AsyncClient()
         loop.run_until_complete(self.__sio.connect('http://localhost:1337'))
 
         for part_conf in configuration:
-            setattr(self, part_conf['name'], Part(self.__emit, part_conf['name'], part_conf["type"]))
+            setattr(self, part_conf['name'], Part(self.__emit, part_conf['name'], part_conf["type"], robot_name))
 
         @self.__sio.on('recieve data')
         def on_message(data):
@@ -27,14 +27,14 @@ class Robot:
         await self.__sio.emit('send to vehicle', data=request_object)
 
 class Part:
-    def __init__(self, emit_func, part_name, part_type):
+    def __init__(self, emit_func, part_name, part_type, robot_name):
         self.__emit = emit_func
         self.__event = asyncio.Event()
         self.__event.set()
         self.__socket_response = None
 
         for method_name, method_spec in robot_specification[part_type]["methods"].items():
-            method_to_mount = self.__generate_method_to_mount(part_name, method_name, method_spec)
+            method_to_mount = self.__generate_method_to_mount(part_name, method_name, method_spec, robot_name)
             setattr(self, camel_case_to_snake_case(method_name), method_to_mount)
 
     def on_message(self, data):
@@ -55,7 +55,7 @@ class Part:
         # TODO: why the heck do we need to wait in order for the emit to work?!?!?!
         await asyncio.sleep(0.000001)
 
-    def __generate_method_to_mount(self, part_name, method_name, method_spec):
+    def __generate_method_to_mount(self, part_name, method_name, method_spec, robot_name):
         # python wierd scoping forces the use of a function building function in order for the arguments above to be local
         def method_to_mount(*args):
             assert len(args) == len(method_spec["arguments"])
@@ -64,7 +64,7 @@ class Part:
                 "api": part_name,
                 "methodName": method_name,
                 "parameters": args,
-                "playerName": "Me"
+                "playerName": robot_name
             }
 
             if method_spec["return"] is not None:

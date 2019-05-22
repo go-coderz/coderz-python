@@ -7,8 +7,8 @@ conf = [
     {"name": "us", "type": "ultrasonic"},
     {"name": "cs", "type": "controlSystem"}
 ]
-
-robot = Robot(conf)
+robot_name = "assgd-4"
+robot = Robot(conf, robot_name)
 
 print(robot.csl.get_color_name())
 print(robot.csr.get_color_name())
