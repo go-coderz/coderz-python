@@ -7,7 +7,7 @@ conf = [
     {"name": "us", "type": "ultrasonic"},
     {"name": "cs", "type": "controlSystem"}
 ]
-robot_name = "assgd-4"
+robot_name = "me"
 robot = Robot(conf, robot_name)
 
 print(robot.csl.get_color_name())
