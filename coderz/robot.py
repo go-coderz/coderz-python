@@ -102,6 +102,7 @@ class Part:
         await self.__emit(request_object)
         # for some weird reason, we need to wait an arbitrarily
         # small amount of time in order for the emit to work.
+        # TODO: figure out why...
         await asyncio.sleep(0.000001)
 
     # a function to build a specific api method for a robot-part.
