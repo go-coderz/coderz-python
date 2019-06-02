@@ -8,6 +8,7 @@ server_url = 'https://socketmulti.gocoderz.com'
 socket_emit_route = 'send to vehicle IDE'
 socket_on_route = 'receive data from IDE'
 token_authentication_required = True
+wait_for_game_start = True
 
 # get the data from a json file that holds all of the possible API classes and methods for a robot.
 with open(os.path.join(os.path.dirname(__file__), './robot-specification.json')) as json_file:
@@ -28,6 +29,9 @@ class Robot:
 
         if token_authentication_required:
             loop.run_until_complete(authenticate_with_token(self.__sio, configuration["token"]))
+
+        if wait_for_game_start:
+            loop.run_until_complete(wait_for_game_start_message(self.__sio))
 
         # for each robot-part specified in the configuration, generate an api to it accessible via it's chosen name.
         for part_conf in configuration["parts"]:
@@ -160,3 +164,17 @@ async def authenticate_with_token(sio, token):
     # wait for a response.
     await event.wait()
 
+
+async def wait_for_game_start_message(sio):
+    # wait until the game start before running any code
+
+    # an event object for async usage
+    event = asyncio.Event()
+
+    # prepare a catch function for a game ready message from the server.
+    @sio.on('run code IDE')
+    def on_message():
+        event.set()
+
+    # wait for a response.
+    await event.wait()
