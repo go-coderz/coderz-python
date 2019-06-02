@@ -2,6 +2,7 @@ import time
 from coderz import Robot
 
 conf = {
+    "token": "2f300f70-851f-11e9-bddd-c71df4df286b",
     "name": "Me",
     "parts": [
         {"name": "csl", "type": "color"},

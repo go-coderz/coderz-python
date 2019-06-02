@@ -4,6 +4,11 @@ from .utils import camel_case_to_snake_case
 import json
 import os
 
+server_url = 'https://socketmulti.gocoderz.com'
+socket_emit_route = 'send to vehicle IDE'
+socket_on_route = 'receive data from IDE'
+token_authentication_required = True
+
 # get the data from a json file that holds all of the possible API classes and methods for a robot.
 with open(os.path.join(os.path.dirname(__file__), './robot-specification.json')) as json_file:
     robot_specification = json.load(json_file)
@@ -19,7 +24,10 @@ class Robot:
 
         # create a socket connection to the robot.
         self.__sio = socketio.AsyncClient()
-        loop.run_until_complete(self.__sio.connect('http://localhost:1337'))
+        loop.run_until_complete(self.__sio.connect(server_url))
+
+        if token_authentication_required:
+            loop.run_until_complete(authenticate_with_token(self.__sio, configuration["token"]))
 
         # for each robot-part specified in the configuration, generate an api to it accessible via it's chosen name.
         for part_conf in configuration["parts"]:
@@ -27,7 +35,7 @@ class Robot:
 
         # notify about a response from the robot to all the api's (only the api waiting for a
         # response will propagate it eventually)
-        @self.__sio.on('recieve data')
+        @self.__sio.on(socket_on_route)
         def on_message(data):
             for part_conf in configuration["parts"]:
                 getattr(self, part_conf['name']).on_message(data)
@@ -36,7 +44,7 @@ class Robot:
     # it is propagated to all of the robot's part api's for each of them to
     # be able to communicate with the robot using the same function.
     async def __emit(self, request_object):
-        await self.__sio.emit('send to vehicle', data=request_object)
+        await self.__sio.emit(socket_emit_route, data=request_object)
 
     # print all the relevant information regarding the robot.
     def print_manual(self):
@@ -132,4 +140,23 @@ class Part:
 
         return method_to_mount
 
+
+async def authenticate_with_token(sio, token):
+    # validate the socket io connection to the server using a token.
+
+    # an event object for async usage
+    event = asyncio.Event()
+
+    # prepare a catch function for a response from the server regarding the status of the authentication.
+    @sio.on('token validation')
+    def on_message(data):
+        if data["status"]:
+            event.set()
+        else:
+            raise Exception('token authentication failed')
+
+    # send an authentication request.
+    await sio.emit('authenticate IDE', data={"token": token})
+    # wait for a response.
+    await event.wait()
 
