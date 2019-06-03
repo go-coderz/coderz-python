@@ -25,4 +25,4 @@ You are now ready to run the code.
 Go to https://multi.gocoderz.com, login and go to UnityTest -> Games -> Multi Game. 
 Once loading is finished, the second icon from the right on the top left panel is a screen with wifi signal, click on it and copy the authentication token.
 
-At the python project, on either index.py or one of the scripts in the examples folder, replace the default token with the one you copied, and then run the code. you will now see the robot following your commands on the coderz website.
+run index.py at the python repository, paste the token when requested and choose the example code you wish to run. Go back to  the CoderZ website and click on the "Play" icon (run simulation).
