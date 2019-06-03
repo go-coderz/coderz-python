@@ -1,7 +1,7 @@
-from .follow_the_line import follow_the_line
+from .move_robot import move_robot
 from .read_sensor_values import read_sensor_values
 
 example_dict = {
-    "follow the line": follow_the_line,
+    "move robot": move_robot,
     "read sensor values": read_sensor_values
 }
