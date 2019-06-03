@@ -7,7 +7,6 @@ import os
 server_url = 'https://socketmulti.gocoderz.com'
 socket_emit_route = 'send to vehicle IDE'
 socket_on_route = 'receive data from IDE'
-token_authentication_required = True
 wait_for_game_start = True
 
 # get the data from a json file that holds all of the possible API classes and methods for a robot.
@@ -27,9 +26,11 @@ class Robot:
         self.__sio = socketio.AsyncClient()
         loop.run_until_complete(self.__sio.connect(server_url))
 
-        if token_authentication_required:
+        # if an authentication token was given, use it to authenticate.
+        if configuration["token"]:
             loop.run_until_complete(authenticate_with_token(self.__sio, configuration["token"]))
 
+        # if it is required to wait for a green light from the server in order to run the code, wait.
         if wait_for_game_start:
             loop.run_until_complete(wait_for_game_start_message(self.__sio))
 
