@@ -1,10 +1,10 @@
 import time
 from coderz import Robot
 
-def move_robot(token):
+
+def move_robot():
 
     conf = {
-        "token": token,
         "name": "Me",
         "parts": [
             {"name": "csl", "type": "color"},
@@ -12,7 +12,14 @@ def move_robot(token):
             {"name": "us", "type": "ultrasonic"},
             {"name": "cs", "type": "controlSystem"},
             {"name": "gyro", "type": "gyro"}
-        ]
+        ],
+        "communication": {
+            "server_url": 'http://localhost:1337',
+            "socket_emit_route": 'send to vehicle',
+            "socket_on_route": 'recieve data',
+            "use_authentication_token": False,
+        },
+        "wait_for_game_start": False
     }
 
     robot = Robot(conf)
