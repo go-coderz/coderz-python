@@ -14,6 +14,7 @@ def move_robot():
             {"name": "gyro", "type": "gyro"}
         ],
         "communication": {
+            "communication_manager_type": "socket",
             "server_url": 'http://localhost:1337',
             "socket_emit_route": 'send to vehicle',
             "socket_on_route": 'recieve data',

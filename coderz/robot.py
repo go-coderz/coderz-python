@@ -1,7 +1,7 @@
 from .utils import camel_case_to_snake_case
 import json
 import os
-from .communication_managers import SocketCommunicationManager
+from .communication_managers import generate_communication_manager
 
 # get the data from a json file that holds all of the possible API classes and methods for a robot.
 with open(os.path.join(os.path.dirname(__file__), './robot-specification.json')) as json_file:
@@ -13,7 +13,7 @@ class Robot:
         # keep a copy of the configuration for later use.
         self.__configuration = configuration
 
-        self.__communication_manager = SocketCommunicationManager(configuration["communication"])
+        self.__communication_manager = generate_communication_manager(configuration["communication"])
 
         # if it is required to wait for a green light from the server in order to run the code, wait.
         if configuration["wait_for_game_start"]:
