@@ -10,4 +10,4 @@
 # **************************************************************
 # hence I cooked up this magnificent pythonic alternative:
 def camel_case_to_snake_case(name):
-    return "".join(["_" + letter.lower() if letter.isupper() and i > 0 else letter.lower() for i, letter in enumerate(name)])
+    return "".join(["_" + letter.lower() if letter.isupper() else letter for letter in name]).lstrip('_')
