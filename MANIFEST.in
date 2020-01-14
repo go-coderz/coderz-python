@@ -1,0 +1,3 @@
+include src/coderz/communication_managers/file.pem
+include src/coderz/robot-specification.json
+include Readme.md

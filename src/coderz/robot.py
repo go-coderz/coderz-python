@@ -11,17 +11,18 @@ class Robot:
     # generate a robot object with an api for each of the robot's parts.
     def __init__(self, configuration):
         # keep a copy of the configuration for later use.
-        self.__configuration = configuration
 
         self.__communication_manager = generate_communication_manager(configuration["communication"])
 
+        self.__configuration = self.__communication_manager.get_configurations()
+
         # if it is required to wait for a green light from the server in order to run the code, wait.
-        if configuration["wait_for_game_start"]:
+        if "wait_for_game_start" in self.__configuration and self.__configuration["wait_for_game_start"]:
             self.__communication_manager.wait_for_game_start_message()
 
         # for each robot-part specified in the configuration, generate an api to it accessible via it's chosen name.
-        for part_conf in configuration["parts"]:
-            setattr(self, part_conf['name'], Part(self.__communication_manager.send_request, part_conf['name'], part_conf["type"], configuration["name"]))
+        for part_conf in self.__configuration["parts"]:
+            setattr(self, part_conf['name'], Part(self.__communication_manager.send_request, part_conf['name'], part_conf["type"], self.__configuration["name"]))
 
     # print all the relevant information regarding the robot.
     def print_manual(self):

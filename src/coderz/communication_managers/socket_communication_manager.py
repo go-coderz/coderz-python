@@ -102,3 +102,5 @@ class SocketCommunicationManager:
         # TODO: figure out why...
         await asyncio.sleep(0.000001)
 
+    def get_configurations(self):
+        return self.__configuration
