@@ -19,6 +19,7 @@ class WebsocketCommunicationManager:
         # save a copy of the configuration for later use.
 
         self.__websocket = None
+        self.__websocket_server = None
         self.__websocket_response = None
 
         async def ws_server(websocket, path):
@@ -47,7 +48,8 @@ class WebsocketCommunicationManager:
 
         start_server = websockets.serve(
             ws_server, "localhost", 25842, ssl=ssl_context)
-        loop.run_until_complete(start_server)
+        self.__websocket_server = loop.run_until_complete(start_server)
+
         self.__configuration = loop.run_until_complete(
             self.__load_configurations())
 
@@ -63,6 +65,7 @@ class WebsocketCommunicationManager:
             loop.run_until_complete(self.__send_command(request_object))
             return None
 
+    '''
     async def wait_for_game_start_message(self):
         # wait until the game start before running any code
 
@@ -76,6 +79,7 @@ class WebsocketCommunicationManager:
 
         # wait for a response.
         await event.wait()
+    '''
 
     # send a request for data from the robot.
     async def __send_request_and_wait_for_response(self, request_object):
@@ -154,4 +158,15 @@ class WebsocketCommunicationManager:
         return self.__configuration
 
     def stop(self):
-        print("Stopping ws server")
+        if self.__websocket_server:
+            print('...closing server')
+            self.__websocket_server.close()
+            loop.run_until_complete(self.__websocket_server.wait_closed())
+
+        ''' Return default values '''
+        self.__websocket = None
+        self.__websocket = None
+        self.__websocket_server = None
+        self.__websocket_response = None
+
+        print("Server closed")

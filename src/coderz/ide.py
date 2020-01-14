@@ -8,33 +8,34 @@ conf = {
 
 
 class Server():
-    _is_connected = False
+    _is_server_started = False
 
     _robot = None
 
     @staticmethod
-    def connect():
-        if Server._is_connected:
-            print("Already connected")
+    def start_server():
+        if Server._is_server_started:
+            print('Server already started')
             return
 
-        Server._is_connected = True
-
         Server._robot = Robot(conf)
+        Server._is_server_started = True
         Server._robot.print_manual()
 
     @staticmethod
-    def disconnect():
-        if not Server._is_connected:
+    def stop_server():
+        if not Server._is_server_started:
             print('Not connected')
             return
-        
-        comm_mngr =  Server._robot.get_comm_mngr()
+
+        comm_mngr = Server._robot.get_comm_mngr()
 
         comm_mngr.stop()
 
-        Server._is_connected = False
-        print('disconnected')
+        Server._is_server_started = False
+        Server._robot = None
+
+        print('Server stopped')
 
     @staticmethod
     def get_robot():
