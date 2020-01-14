@@ -6,4 +6,5 @@ def generate_communication_manager(configuration):
         from .ide_communication_manager import WebsocketCommunicationManager
         return WebsocketCommunicationManager(configuration)
     else:
-        print("communication manager type {0} not found".format(configuration["communication_manager_type"]))
+        print("communication manager type {0} not found".format(
+            configuration["communication_manager_type"]))

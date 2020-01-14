@@ -75,9 +75,7 @@
         }
     },
     "gps": {
-        "methods": {
-
-        }
+        "methods": {}
     },
     "tl": {
         "methods": {
