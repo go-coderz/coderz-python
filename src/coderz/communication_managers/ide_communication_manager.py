@@ -160,6 +160,9 @@ class WebsocketCommunicationManager:
     def stop(self):
         if self.__websocket_server:
             print('...closing server')
+            if self.__websocket:
+                loop.run_until_complete(self.__websocket.close(code=1002, reason='force close from server'))
+
             self.__websocket_server.close()
             loop.run_until_complete(self.__websocket_server.wait_closed())
 
