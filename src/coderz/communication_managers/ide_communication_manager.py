@@ -130,6 +130,7 @@ class WebsocketCommunicationManager:
         await self.__websocket.send(json.dumps(send_obj))
 
     async def __load_configurations(self):
+        print('Waiting for client')
         ''' Clear the event variable to open up for later responses. '''
 
         # wait till one client connects
@@ -150,6 +151,7 @@ class WebsocketCommunicationManager:
 
         await self.__websocket.send(json.dumps(send_obj))
 
+        print('Waiting for client responce')
         # waits for responce
         while self.__websocket_response is None:
             await asyncio.sleep(1)
@@ -164,7 +166,8 @@ class WebsocketCommunicationManager:
         if self.__websocket_server:
             print('...closing server')
             if self.__websocket:
-                loop.run_until_complete(self.__websocket.close(code=1002, reason='force close from server'))
+                loop.run_until_complete(self.__websocket.close(
+                    code=1002, reason='force close from server'))
 
             self.__websocket_server.close()
             loop.run_until_complete(self.__websocket_server.wait_closed())
