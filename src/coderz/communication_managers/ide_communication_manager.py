@@ -52,6 +52,7 @@ class WebsocketCommunicationManager:
             ws_server, "localhost", 25842, ssl=ssl_context)
         self.__websocket_server = loop.run_until_complete(start_server)
 
+        ''' This is blocking all I/O 🐒 '''
         self.__configuration = loop.run_until_complete(
             self.__load_configurations())
 
