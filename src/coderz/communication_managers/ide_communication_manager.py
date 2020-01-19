@@ -5,7 +5,7 @@ import json
 import websockets
 
 
-loop = asyncio.get_event_loop()
+# loop = asyncio.get_event_loop()
 
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 localhost_pem = pathlib.Path(__file__).with_name("file.pem")
@@ -15,18 +15,13 @@ ssl_context.load_cert_chain(localhost_pem)
 class WebsocketCommunicationManager:
     ''' This manager allows communication for a 3rd part IDE with either the unity editor or the CoderZ website. '''
 
-    def __init__(self, configuration):
+    def __init__(self, configuration, ready=None):
         # save a copy of the configuration for later use.
 
         self.__websocket = None
         self.__websocket_server = None
         self.__websocket_response = None
-
-        self.start()
-
-        ''' This is blocking all I/O 🐒 '''
-        self.__configuration = loop.run_until_complete(
-            self.__load_configurations())
+        self.ready = ready
 
     async def ws_server(self, websocket, path):
         await asyncio.sleep(1)
@@ -52,7 +47,6 @@ class WebsocketCommunicationManager:
         print('inside wait_responce', message)
         jsonLoaded = json.loads(message)
 
-
         # await self.__websocket.send(message)
 
         if jsonLoaded['message'] == 'send data to IDE':
@@ -66,8 +60,12 @@ class WebsocketCommunicationManager:
 
     def send_request(self, request_object, should_wait_for_answer):
         ''' General request function to communicate with the robot. '''
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         # if the method returns value:
         if should_wait_for_answer is not None:
+
             res = loop.run_until_complete(
                 self.__send_request_and_wait_for_response(request_object))
             return res["result"]
@@ -171,18 +169,37 @@ class WebsocketCommunicationManager:
         return self.__configuration
 
     def start(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
         start_server = websockets.serve(
             self.ws_server, "localhost", 25842, ssl=ssl_context)
         self.__websocket_server = loop.run_until_complete(start_server)
 
+        loop.run_forever()
+
+    def get_configuration(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        ''' This is blocking all I/O 🐒 '''
+        self.__configuration = loop.run_until_complete(
+            self.__load_configurations())
+        self.ready.set()
+
     def stop(self):
         if self.__websocket_server:
             print('...closing server')
+
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
             if self.__websocket:
                 loop.run_until_complete(self.__websocket.close(
                     code=1002, reason='force close from server'))
 
             self.__websocket_server.close()
+
             loop.run_until_complete(self.__websocket_server.wait_closed())
 
         ''' Return default values '''

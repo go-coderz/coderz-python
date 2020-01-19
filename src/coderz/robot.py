@@ -1,5 +1,6 @@
 from .utils import camel_case_to_snake_case
 import json
+from threading import Event, Thread
 import os
 from .communication_managers import generate_communication_manager
 
@@ -14,8 +15,16 @@ class Robot:
     def __init__(self, configuration):
         # keep a copy of the configuration for later use.
 
+        ready_event = Event()
         self.__communication_manager = generate_communication_manager(
-            configuration["communication"])
+            configuration["communication"], ready_event)
+
+        thread = Thread(target=self.__communication_manager.start)
+        thread.start()
+
+        self.__communication_manager.get_configuration()
+
+        ready_event.wait()
 
         self.__configuration = self.__communication_manager.get_configurations()
 
