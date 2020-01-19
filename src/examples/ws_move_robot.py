@@ -1,5 +1,17 @@
 import time
+import asyncio
+
 from coderz import Robot, Server
+
+
+loop = asyncio.get_event_loop()
+
+
+def wait_fnc(time_to_wait):
+    i = 0
+    while i < time_to_wait:
+        loop.run_until_complete(asyncio.sleep(1))
+        i += 1
 
 
 def ws_move_robot():
@@ -30,16 +42,16 @@ def ws_move_robot():
     print("------------------------------")
 
     robot.cs.set_speed(50, 50)
-    time.sleep(5)
+    wait_fnc(5)
     print('robot stop both')
     robot.cs.stop('both')
-    time.sleep(2)
+    wait_fnc(2)
     print('robot set_speed -10, 10')
     robot.cs.set_speed(-10, 10)
-    time.sleep(0.5)
+    wait_fnc(1)
     print('robot set_speed 50, 50')
     robot.cs.set_speed(50, 50)
-    time.sleep(5)
+    wait_fnc(5)
     print('robot stop both')
     robot.cs.stop('both')
     print('done!')
@@ -47,7 +59,3 @@ def ws_move_robot():
     Server.stop()
 
     print('after stop')
-
-
-
-
