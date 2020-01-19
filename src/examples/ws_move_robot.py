@@ -23,7 +23,7 @@ def ws_move_robot():
         "wait_for_game_start": False
     }
 
-    Server.start_server()
+    Server.start()
 
     robot = Server.get_robot()
 
@@ -44,7 +44,7 @@ def ws_move_robot():
     robot.cs.stop('both')
     print('done!')
 
-    Server.stop_server()
+    Server.stop()
 
     print('after stop')
 
