@@ -13,7 +13,7 @@ class Server():
     _robot = None
 
     @staticmethod
-    def start_server():
+    def start():
         if Server._is_server_started:
             print('Server already started')
             return
@@ -23,7 +23,7 @@ class Server():
         Server._robot.print_manual()
 
     @staticmethod
-    def stop_server():
+    def stop():
         if not Server._is_server_started:
             print('Not connected')
             return

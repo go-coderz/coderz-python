@@ -30,6 +30,8 @@ class WebsocketCommunicationManager:
                 # run websocket until close or disconnect.
                 async for message in websocket:
                     await wait_responce(self, message)
+            except websockets.exceptions.ConnectionClosed:
+                print('connection closed')
             finally:
                 self.__websocket = None
 
