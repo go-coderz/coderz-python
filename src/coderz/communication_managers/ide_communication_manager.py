@@ -22,39 +22,47 @@ class WebsocketCommunicationManager:
         self.__websocket_server = None
         self.__websocket_response = None
 
-        async def ws_server(websocket, path):
-            if self.__websocket is None:
-                self.__websocket = websocket
-
-            try:
-                # run websocket until close or disconnect.
-                async for message in websocket:
-                    await wait_responce(self, message)
-            except websockets.exceptions.ConnectionClosed:
-                print('connection closed')
-            finally:
-                self.__websocket = None
-
-        async def wait_responce(self, message):
-            # message = await self.__websocket.recv()
-            jsonLoaded = json.loads(message)
-
-            if jsonLoaded['message'] == 'send data to IDE':
-                recieved_data = jsonLoaded['data']
-                self.__websocket_response = recieved_data
-            elif jsonLoaded['message'] == 'configuration loaded':
-                recieved_data = jsonLoaded['data']
-                self.__websocket_response = recieved_data
-            else:
-                print("message not implimented")
-
-        start_server = websockets.serve(
-            ws_server, "localhost", 25842, ssl=ssl_context)
-        self.__websocket_server = loop.run_until_complete(start_server)
+        self.start()
 
         ''' This is blocking all I/O 🐒 '''
         self.__configuration = loop.run_until_complete(
             self.__load_configurations())
+
+    async def ws_server(self, websocket, path):
+        await asyncio.sleep(1)
+
+        if self.__websocket is None:
+            self.__websocket = websocket
+
+        try:
+            # run websocket until close or disconnect.
+            async for message in websocket:
+                # await self.__websocket.send('status')
+                # await asyncio.sleep(1)
+                self.wait_responce(message)
+        except websockets.exceptions.ConnectionClosed:
+            self.stop()
+            self.start()
+            print('connection closed')
+        finally:
+            self.__websocket = None
+
+    def wait_responce(self, message):
+        # message = await self.__websocket.recv()
+        print('inside wait_responce', message)
+        jsonLoaded = json.loads(message)
+
+
+        # await self.__websocket.send(message)
+
+        if jsonLoaded['message'] == 'send data to IDE':
+            recieved_data = jsonLoaded['data']
+            self.__websocket_response = recieved_data
+        elif jsonLoaded['message'] == 'configuration loaded':
+            recieved_data = jsonLoaded['data']
+            self.__websocket_response = recieved_data
+        else:
+            print("message not implimented")
 
     def send_request(self, request_object, should_wait_for_answer):
         ''' General request function to communicate with the robot. '''
@@ -161,6 +169,11 @@ class WebsocketCommunicationManager:
 
     def get_configurations(self):
         return self.__configuration
+
+    def start(self):
+        start_server = websockets.serve(
+            self.ws_server, "localhost", 25842, ssl=ssl_context)
+        self.__websocket_server = loop.run_until_complete(start_server)
 
     def stop(self):
         if self.__websocket_server:
