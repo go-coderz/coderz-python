@@ -28,13 +28,13 @@ class WebsocketCommunicationManager:
 
             try:
                 # run websocket until close or disconnect.
-                while 1:
-                    await wait_responce(self)
+                async for message in websocket:
+                    await wait_responce(self, message)
             finally:
                 self.__websocket = None
 
-        async def wait_responce(self):
-            message = await self.__websocket.recv()
+        async def wait_responce(self, message):
+            # message = await self.__websocket.recv()
             jsonLoaded = json.loads(message)
 
             if jsonLoaded['message'] == 'send data to IDE':
