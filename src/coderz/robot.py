@@ -16,11 +16,13 @@ class Robot:
         # keep a copy of the configuration for later use.
 
         ready_event = Event()
+
+        print('start thread!!!!!!!!')
         self.__communication_manager = generate_communication_manager(
             configuration["communication"], ready_event)
 
-        thread = Thread(target=self.__communication_manager.start)
-        thread.start()
+        self.thread = Thread(target=self.__communication_manager.start)
+        self.thread.start()
 
         self.__communication_manager.get_configuration()
 
@@ -36,6 +38,9 @@ class Robot:
         for part_conf in self.__configuration["parts"]:
             setattr(self, part_conf['name'], Part(self.__communication_manager.send_request,
                                                   part_conf['name'], part_conf["type"], self.__configuration["name"]))
+
+    def get_thread(self):
+        return self.thread
 
     def get_comm_mngr(self):
         return self.__communication_manager

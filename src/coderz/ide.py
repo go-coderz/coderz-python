@@ -32,6 +32,8 @@ class Server():
 
         comm_mngr.stop()
 
+        Server._robot.get_thread().join(1)
+
         Server._is_server_started = False
         Server._robot = None
 
