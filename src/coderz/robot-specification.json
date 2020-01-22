@@ -1,6 +1,10 @@
 {
     "color": {
         "methods": {
+            "GetColor": {
+                "arguments": [],
+                "return": "float[]"
+            },
             "GetColorName": {
                 "arguments": [],
                 "return": "string"
@@ -17,6 +21,15 @@
     },
     "controlSystem": {
         "methods": {
+            "DriveDistance": {
+                "arguments": [
+                    {
+                        "name": "distanceCm",
+                        "type": "float"
+                    }
+                ],
+                "return": null
+            },
             "SetPower": {
                 "arguments": [
                     {
@@ -51,6 +64,15 @@
                     }
                 ],
                 "return": null
+            },
+            "TurnTo": {
+                "arguments": [
+                    {
+                        "name": "angle",
+                        "type": "float"
+                    }
+                ],
+                "return": null
             }
         }
     },
@@ -75,7 +97,98 @@
         }
     },
     "gps": {
-        "methods": {}
+        "methods": {
+            "GetAngle": {
+                "arguments": [],
+                "return": "float"
+            },
+            "GetPosition": {
+                "arguments": [],
+                "return": "vector3"
+            },
+            "GetPositionX": {
+                "arguments": [],
+                "return": "float"
+            },
+            "GetPositionY": {
+                "arguments": [],
+                "return": "float"
+            },
+            "GetPositionZ": {
+                "arguments": [],
+                "return": "float"
+            },
+            "GetVelocity": {
+                "arguments": [],
+                "return": "float"
+            }
+        }
+    },
+    "el": {
+        "methods": {
+            "GetEncoderValue": {
+                "arguments": [],
+                "return": "float"
+            },
+            "Reset": {
+                "arguments": [],
+                "return": null
+            }
+        }
+    },
+    "er": {
+        "methods": {
+            "GetEncoderValue": {
+                "arguments": [],
+                "return": "float"
+            },
+            "Reset": {
+                "arguments": [],
+                "return": null
+            }
+        }
+    },
+    "mr": {
+        "methods": {
+            "GetAngularVelocity": {
+                "arguments": [],
+                "return": "float"
+            },
+            "SetPower": {
+                "arguments": [
+                    {
+                        "name": "power",
+                        "type": "float"
+                    }
+                ],
+                "return": null
+            },
+            "Stop": {
+                "arguments": [],
+                "return": null
+            }
+        }
+    },
+    "ml": {
+        "methods": {
+            "GetAngularVelocity": {
+                "arguments": [],
+                "return": "float"
+            },
+            "SetPower": {
+                "arguments": [
+                    {
+                        "name": "power",
+                        "type": "float"
+                    }
+                ],
+                "return": null
+            },
+            "Stop": {
+                "arguments": [],
+                "return": null
+            }
+        }
     },
     "tl": {
         "methods": {
@@ -96,14 +209,9 @@
                 ],
                 "return": null
             },
-            "Rotate": {
-                "arguments": [
-                    {
-                        "name": "right",
-                        "type": "boolean"
-                    }
-                ],
-                "return": null
+            "GetCooldown": {
+                "arguments": [],
+                "return": "float"
             },
             "Lift": {
                 "arguments": [
@@ -114,9 +222,14 @@
                 ],
                 "return": null
             },
-            "GetCooldown": {
-                "arguments": [],
-                "return": "float"
+            "Rotate": {
+                "arguments": [
+                    {
+                        "name": "right",
+                        "type": "boolean"
+                    }
+                ],
+                "return": null
             }
         }
     },
