@@ -1,6 +1,10 @@
 {
     "color": {
         "methods": {
+            "GetColor": {
+                "arguments": [],
+                "return": "float[]"
+            },
             "GetColorName": {
                 "arguments": [],
                 "return": "string"
