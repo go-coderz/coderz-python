@@ -5,7 +5,7 @@ with open("Readme.md", "r") as fh:
     long_description = fh.read()
 setuptools.setup(
     name='coderz',
-    version='0.1.4',
+    version='0.1.5',
     author="CoderZ",
     author_email="app@gocoderz.com",
     python_requires='>3.0',
