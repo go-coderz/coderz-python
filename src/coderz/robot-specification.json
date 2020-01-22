@@ -17,15 +17,6 @@
     },
     "controlSystem": {
         "methods": {
-            "TurnTo": {
-                "arguments": [
-                    {
-                        "name": "angle",
-                        "type": "float"
-                    }
-                ],
-                "return": null
-            },
             "DriveDistance": {
                 "arguments": [
                     {
@@ -69,6 +60,15 @@
                     }
                 ],
                 "return": null
+            },
+            "TurnTo": {
+                "arguments": [
+                    {
+                        "name": "angle",
+                        "type": "float"
+                    }
+                ],
+                "return": null
             }
         }
     },
@@ -94,10 +94,6 @@
     },
     "gps": {
         "methods": {
-            "GetVelocity": {
-                "arguments": [],
-                "return": "float"
-            },
             "GetAngle": {
                 "arguments": [],
                 "return": "float"
@@ -117,35 +113,43 @@
             "GetPositionZ": {
                 "arguments": [],
                 "return": "float"
+            },
+            "GetVelocity": {
+                "arguments": [],
+                "return": "float"
             }
         }
     },
     "el": {
         "methods": {
-            "Reset": {
-                "arguments": [],
-                "return": null
-            },
             "GetEncoderValue": {
                 "arguments": [],
                 "return": "float"
+            },
+            "Reset": {
+                "arguments": [],
+                "return": null
             }
         }
     },
     "er": {
         "methods": {
-            "Reset": {
-                "arguments": [],
-                "return": null
-            },
             "GetEncoderValue": {
                 "arguments": [],
                 "return": "float"
+            },
+            "Reset": {
+                "arguments": [],
+                "return": null
             }
         }
     },
     "mr": {
         "methods": {
+            "GetAngularVelocity": {
+                "arguments": [],
+                "return": "float"
+            },
             "SetPower": {
                 "arguments": [
                     {
@@ -158,15 +162,15 @@
             "Stop": {
                 "arguments": [],
                 "return": null
-            },
-            "GetAngularVelocity": {
-                "arguments": [],
-                "return": "float"
             }
         }
     },
     "ml": {
         "methods": {
+            "GetAngularVelocity": {
+                "arguments": [],
+                "return": "float"
+            },
             "SetPower": {
                 "arguments": [
                     {
@@ -179,10 +183,6 @@
             "Stop": {
                 "arguments": [],
                 "return": null
-            },
-            "GetAngularVelocity": {
-                "arguments": [],
-                "return": "float"
             }
         }
     },
@@ -205,14 +205,9 @@
                 ],
                 "return": null
             },
-            "Rotate": {
-                "arguments": [
-                    {
-                        "name": "right",
-                        "type": "boolean"
-                    }
-                ],
-                "return": null
+            "GetCooldown": {
+                "arguments": [],
+                "return": "float"
             },
             "Lift": {
                 "arguments": [
@@ -223,9 +218,14 @@
                 ],
                 "return": null
             },
-            "GetCooldown": {
-                "arguments": [],
-                "return": "float"
+            "Rotate": {
+                "arguments": [
+                    {
+                        "name": "right",
+                        "type": "boolean"
+                    }
+                ],
+                "return": null
             }
         }
     },
