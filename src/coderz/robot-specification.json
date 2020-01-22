@@ -17,6 +17,24 @@
     },
     "controlSystem": {
         "methods": {
+            "TurnTo": {
+                "arguments": [
+                    {
+                        "name": "angle",
+                        "type": "float"
+                    }
+                ],
+                "return": null
+            },
+            "DriveDistance": {
+                "arguments": [
+                    {
+                        "name": "distanceCm",
+                        "type": "float"
+                    }
+                ],
+                "return": null
+            },
             "SetPower": {
                 "arguments": [
                     {
@@ -75,7 +93,98 @@
         }
     },
     "gps": {
-        "methods": {}
+        "methods": {
+            "GetVelocity": {
+                "arguments": [],
+                "return": "float"
+            },
+            "GetAngle": {
+                "arguments": [],
+                "return": "float"
+            },
+            "GetPosition": {
+                "arguments": [],
+                "return": "vector3"
+            },
+            "GetPositionX": {
+                "arguments": [],
+                "return": "float"
+            },
+            "GetPositionY": {
+                "arguments": [],
+                "return": "float"
+            },
+            "GetPositionZ": {
+                "arguments": [],
+                "return": "float"
+            }
+        }
+    },
+    "el": {
+        "methods": {
+            "Reset": {
+                "arguments": [],
+                "return": null
+            },
+            "GetEncoderValue": {
+                "arguments": [],
+                "return": "float"
+            }
+        }
+    },
+    "er": {
+        "methods": {
+            "Reset": {
+                "arguments": [],
+                "return": null
+            },
+            "GetEncoderValue": {
+                "arguments": [],
+                "return": "float"
+            }
+        }
+    },
+    "mr": {
+        "methods": {
+            "SetPower": {
+                "arguments": [
+                    {
+                        "name": "power",
+                        "type": "float"
+                    }
+                ],
+                "return": null
+            },
+            "Stop": {
+                "arguments": [],
+                "return": null
+            },
+            "GetAngularVelocity": {
+                "arguments": [],
+                "return": "float"
+            }
+        }
+    },
+    "ml": {
+        "methods": {
+            "SetPower": {
+                "arguments": [
+                    {
+                        "name": "power",
+                        "type": "float"
+                    }
+                ],
+                "return": null
+            },
+            "Stop": {
+                "arguments": [],
+                "return": null
+            },
+            "GetAngularVelocity": {
+                "arguments": [],
+                "return": "float"
+            }
+        }
     },
     "tl": {
         "methods": {
