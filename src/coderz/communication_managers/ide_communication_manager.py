@@ -44,7 +44,6 @@ class WebsocketCommunicationManager:
 
     def wait_responce(self, message):
         # message = await self.__websocket.recv()
-        print('inside wait_responce', message)
         jsonLoaded = json.loads(message)
 
         # await self.__websocket.send(message)
@@ -56,7 +55,7 @@ class WebsocketCommunicationManager:
             recieved_data = jsonLoaded['data']
             self.__websocket_response = recieved_data
         else:
-            print("message not implimented")
+            print("message not implimented", message)
 
     def send_request(self, request_object, should_wait_for_answer):
         ''' General request function to communicate with the robot. '''
