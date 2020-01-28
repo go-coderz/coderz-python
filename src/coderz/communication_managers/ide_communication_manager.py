@@ -12,6 +12,9 @@ localhost_pem = pathlib.Path(__file__).with_name("file.pem")
 ssl_context.load_cert_chain(localhost_pem)
 
 
+SLEEP_TIME = 0.1
+
+
 class WebsocketCommunicationManager:
     ''' This manager allows communication for a 3rd part IDE with either the unity editor or the CoderZ website. '''
 
@@ -27,7 +30,7 @@ class WebsocketCommunicationManager:
         self.ready = ready
 
     async def ws_server(self, websocket, path):
-        await asyncio.sleep(1)
+        await asyncio.sleep(SLEEP_TIME)
 
         if self.__websocket is None:
             self.__websocket = websocket
@@ -100,7 +103,7 @@ class WebsocketCommunicationManager:
 
         # wait till one client connects
         while (not self.__websocket):
-            await asyncio.sleep(1)
+            await asyncio.sleep(SLEEP_TIME)
 
         '''
         Emit the request and wait for a response
@@ -119,7 +122,7 @@ class WebsocketCommunicationManager:
 
         # waits for responce
         while self.__websocket_response is None:
-            await asyncio.sleep(1)
+            await asyncio.sleep(SLEEP_TIME)
 
         # return the response.
         return json.loads(self.__websocket_response)
@@ -133,7 +136,7 @@ class WebsocketCommunicationManager:
 
         # wait till one client connects
         while (not self.__websocket):
-            await asyncio.sleep(1)
+            await asyncio.sleep(SLEEP_TIME)
 
         send_obj = {
             'message': 'control vehicle IDE',
@@ -150,7 +153,7 @@ class WebsocketCommunicationManager:
 
         # wait till one client connects
         while (not self.__websocket):
-            await asyncio.sleep(1)
+            await asyncio.sleep(SLEEP_TIME)
 
         '''
         Emit the request and wait for a response
@@ -169,7 +172,7 @@ class WebsocketCommunicationManager:
         print('Waiting for client responce')
         # waits for responce
         while self.__websocket_response is None:
-            await asyncio.sleep(1)
+            await asyncio.sleep(SLEEP_TIME)
 
         # return the response.
         return self.__websocket_response
@@ -191,7 +194,7 @@ class WebsocketCommunicationManager:
                 if self.stopped():
                     print('stopped!!!!')
                     break
-                loop.run_until_complete(asyncio.sleep(1))
+                loop.run_until_complete(asyncio.sleep(SLEEP_TIME))
         finally:
             if self.__websocket:
                 loop.run_until_complete(self.__websocket.close(
