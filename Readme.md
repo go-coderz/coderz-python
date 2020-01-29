@@ -28,7 +28,6 @@ Simple run this script
 ```bash
 ./build.sh
 ```
-
 ## Running the code
 
 Go to [https://multi.gocoderz.com](https://multi.gocoderz.com), login and go to UnityTest -> Games -> Multi Game.
