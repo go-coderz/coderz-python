@@ -1,12 +1,8 @@
-from .utils import camel_case_to_snake_case
+from .utils import camel_case_to_snake_case, format_type_to_python
 import json
 from threading import Event, Thread
 import os
 from .communication_managers import generate_communication_manager
-
-# get the data from a json file that holds all of the possible API classes and methods for a robot.
-with open(os.path.join(os.path.dirname(__file__), './robot-specification.json')) as json_file:
-    robot_specification = json.load(json_file)
 
 
 class Robot:
@@ -17,7 +13,6 @@ class Robot:
 
         ready_event = Event()
 
-        print('start thread!!!!!!!!')
         self.__communication_manager = generate_communication_manager(
             configuration["communication"], ready_event)
 
@@ -34,10 +29,15 @@ class Robot:
         if "wait_for_game_start" in self.__configuration and self.__configuration["wait_for_game_start"]:
             self.__communication_manager.wait_for_game_start_message()
 
+        robot_name = self.__configuration["name"]
+
         # for each robot-part specified in the configuration, generate an api to it accessible via it's chosen name.
-        for part_conf in self.__configuration["parts"]:
-            setattr(self, part_conf['name'], Part(self.__communication_manager.send_request,
-                                                  part_conf['name'], part_conf["type"], self.__configuration["name"]))
+        for part_conf in self.__configuration["Subroutes"]:
+            part_name = part_conf['Name']
+            methods = part_conf['Methods']
+
+            setattr(self, part_name, Part(
+                self.__communication_manager.send_request, part_name, methods, robot_name))
 
     def get_thread(self):
         return self.thread
@@ -45,51 +45,59 @@ class Robot:
     def get_comm_mngr(self):
         return self.__communication_manager
 
-    # print all the relevant information regarding the robot.
     def print_manual(self):
+        ''' Print all the relevant information regarding the robot. '''
+
         print("Robot name: {0}\n".format(self.__configuration["name"]))
 
         print("API options:")
 
-        for robot_part in self.__configuration["parts"]:
-            # general info about the robot part
-            print("\nPart name: \"{0}\", type: \"{1}\".".format(
-                robot_part["name"], robot_part["type"]))
+        for robot_part in self.__configuration["Subroutes"]:
+            ''' General info about the robot part. '''
+            print(F'\nPart Name: {robot_part["Name"]}')
             print("\tUsage:")
 
-            # for each of the part methods, print how to use it including all arguments and their types.
-            for method_name, method_spec in robot_specification[robot_part["type"]]["methods"].items():
-                method_arguments = ', '.join(
-                    "{0} <{1}>".format(argument["name"], argument["type"]) for argument in method_spec["arguments"]
-                )
+            ''' for each of the part methods, print how to use it including all arguments and their types. '''
+            for method in robot_part['Methods']:
+                method_name = method['Name']
+                method_spec = method['Parameters']
+
+                method_arguments = ', '.join("{0} <{1}>".format(
+                    argument['Name'], format_type_to_python(argument['Type'])) for argument in method_spec)
 
                 print("\t\trobot.{0}.{1}({2})".format(
-                    robot_part["name"],
+                    robot_part['Name'],
                     camel_case_to_snake_case(method_name),
                     method_arguments)
                 )
 
 
 class Part:
-    def __init__(self, __send_request_func, part_name, part_type, robot_name):
-        # a function to send requests to the robot.
+    def __init__(self, __send_request_func, part_name, part_methods, robot_name):
+        ''' A function to send requests to the robot. '''
         self.__send_request_func = __send_request_func
 
         # generate a function for each of the robot-part available api calls.
-        for method_name, method_spec in robot_specification[part_type]["methods"].items():
+        for method in part_methods:
+            method_name = method['Name']
+            method_spec = method['Parameters']
+            return_type = format_type_to_python(method['ReturnType'])
+
             method_to_mount = self.__generate_method_to_mount(
-                part_name, method_name, method_spec, robot_name)
+                part_name, method_name, method_spec, return_type, robot_name)
+
             setattr(self, camel_case_to_snake_case(
                 method_name), method_to_mount)
 
     # a function to build a specific api method for a robot-part.
-    def __generate_method_to_mount(self, part_name, method_name, method_spec, robot_name):
+    def __generate_method_to_mount(self, part_name, method_name, method_spec, return_type, robot_name):
 
         # the method.
         def method_to_mount(*args):
             # make sure the amount of arguments given are correct.
             # TODO: type-check the arguments as well.
-            assert len(args) == len(method_spec["arguments"])
+
+            assert len(args) == len(method_spec)
 
             # which data to send with the api request.
             request_object = {
@@ -100,7 +108,7 @@ class Part:
             }
 
             res = self.__send_request_func(
-                request_object, method_spec["return"])
+                request_object, return_type)
             return res
 
         return method_to_mount
