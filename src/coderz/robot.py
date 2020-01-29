@@ -32,9 +32,9 @@ class Robot:
         robot_name = self.__configuration["name"]
 
         # for each robot-part specified in the configuration, generate an api to it accessible via it's chosen name.
-        for part_conf in self.__configuration["subroutes"]:
-            part_name = part_conf['name']
-            methods = part_conf['methods']
+        for part_conf in self.__configuration["Subroutes"]:
+            part_name = part_conf['Name']
+            methods = part_conf['Methods']
 
             setattr(self, part_name, Part(
                 self.__communication_manager.send_request, part_name, methods, robot_name))
@@ -52,21 +52,21 @@ class Robot:
 
         print("API options:")
 
-        for robot_part in self.__configuration["subroutes"]:
+        for robot_part in self.__configuration["Subroutes"]:
             ''' General info about the robot part. '''
-            print(F'\nPart Name: {robot_part["name"]}')
+            print(F'\nPart Name: {robot_part["Name"]}')
             print("\tUsage:")
 
             ''' for each of the part methods, print how to use it including all arguments and their types. '''
-            for method in robot_part['methods']:
-                method_name = method['name']
-                method_spec = method['parameters']
+            for method in robot_part['Methods']:
+                method_name = method['Name']
+                method_spec = method['Parameters']
 
                 method_arguments = ', '.join("{0} <{1}>".format(
-                    argument['name'], format_type_to_python(argument['type'])) for argument in method_spec)
+                    argument['Name'], format_type_to_python(argument['Type'])) for argument in method_spec)
 
                 print("\t\trobot.{0}.{1}({2})".format(
-                    robot_part['name'],
+                    robot_part['Name'],
                     camel_case_to_snake_case(method_name),
                     method_arguments)
                 )
@@ -79,9 +79,9 @@ class Part:
 
         # generate a function for each of the robot-part available api calls.
         for method in part_methods:
-            method_name = method['name']
-            method_spec = method['parameters']
-            return_type = format_type_to_python(method['returnType'])
+            method_name = method['Name']
+            method_spec = method['Parameters']
+            return_type = format_type_to_python(method['ReturnType'])
 
             method_to_mount = self.__generate_method_to_mount(
                 part_name, method_name, method_spec, return_type, robot_name)
