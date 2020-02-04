@@ -29,7 +29,7 @@ class Robot:
         if "wait_for_game_start" in self.__configuration and self.__configuration["wait_for_game_start"]:
             self.__communication_manager.wait_for_game_start_message()
 
-        robot_name = self.__configuration["name"]
+        robot_name = self.__configuration["Name"]
 
         # for each robot-part specified in the configuration, generate an api to it accessible via it's chosen name.
         for part_conf in self.__configuration["Subroutes"]:
@@ -48,7 +48,7 @@ class Robot:
     def print_manual(self):
         ''' Print all the relevant information regarding the robot. '''
 
-        print("Robot name: {0}\n".format(self.__configuration["name"]))
+        print("Robot name: {0}\n".format(self.__configuration["Name"]))
 
         print("API options:")
 
