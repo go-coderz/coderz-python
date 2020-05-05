@@ -12,7 +12,7 @@ localhost_pem = pathlib.Path(__file__).with_name("file.pem")
 ssl_context.load_cert_chain(localhost_pem)
 
 
-SLEEP_TIME = 0.1
+SLEEP_TIME = 0.01
 
 
 class WebsocketCommunicationManager:
