@@ -20,62 +20,66 @@ class WebsocketCommunicationManager:
 
     def __init__(self, configuration, ready=None):
         # save a copy of the configuration for later use.
-
-        self.__websocket = None
-        self.__websocket_server = None
-        self.__websocket_response = None
+        self.response_data = None
 
         self._stop = threading.Event()
 
         self.ready = ready
 
+        self.request_lock = threading.Lock()
+        self.response_lock = threading.Lock()
+
+        self.request_event = threading.Event()
+        self.response_event = threading.Event()
+        self.response_event.set()
+        self.command_event = threading.Event()
+        self.command_event.set()
+
+        self.request_data = None
+        self.response_data = None
+
     async def ws_server(self, websocket, path):
-        await asyncio.sleep(SLEEP_TIME)
+        while True:
+            await asyncio.sleep(SLEEP_TIME)
+            if not self.ready.is_set():
+                self.ready.set()
 
-        if self.__websocket is None:
-            self.__websocket = websocket
+            with self.request_lock:
+                if self.request_data != None:
+                    await websocket.send(json.dumps(self.request_data))
 
-        # run websocket until close or disconnect.
-        try:
-            async for message in websocket:
-                self.wait_responce(message)
-        except websockets.exceptions.ConnectionClosed:
-            self.__websocket = None
-            print('client disconnected')
-        finally:
-            self.__websocket = None
+                    if not self.command_event.is_set():
+                        self.command_event.set()
 
-    def wait_responce(self, message):
-        # message = await self.__websocket.recv()
+            if not self.response_event.is_set():
+                message = await websocket.recv()
+                self.wait_response(message)
+
+
+    def wait_response(self, message):
         jsonLoaded = json.loads(message)
 
-        # await self.__websocket.send(message)
-
         if jsonLoaded['message'] == 'send data to IDE':
-            recieved_data = jsonLoaded['data']
-            self.__websocket_response = recieved_data
+            recieved_data = json.loads(jsonLoaded['data'])
+            self.response_data = recieved_data
         elif jsonLoaded['message'] == 'configuration loaded':
             recieved_data = jsonLoaded['data']
-            self.__websocket_response = recieved_data
+            self.response_data = recieved_data
         else:
             print("message not implimented", message)
+
+        self.response_event.set()
 
     def send_request(self, request_object, should_wait_for_answer):
         ''' General request function to communicate with the robot. '''
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
         # if the method returns value:
         if should_wait_for_answer is not None:
-
-            res = loop.run_until_complete(
-                self.__send_request_and_wait_for_response(request_object))
-            loop.close()
+            res = self.__send_request_and_wait_for_response(request_object)
             return res["result"]
             # if it doesn't return a value:
         else:
-            loop.run_until_complete(self.__send_command(request_object))
-            loop.close()
+            self.__send_command(request_object)
             return None
 
     '''
@@ -95,15 +99,8 @@ class WebsocketCommunicationManager:
     '''
 
     # send a request for data from the robot.
-    async def __send_request_and_wait_for_response(self, request_object):
+    def __send_request_and_wait_for_response(self, request_object):
         # clear the event variable to open up for later responses.
-
-        if not self.__websocket:
-            print('Waiting for client connection')
-
-        # wait till one client connects
-        while (not self.__websocket):
-            await asyncio.sleep(SLEEP_TIME)
 
         '''
         Emit the request and wait for a response
@@ -115,45 +112,31 @@ class WebsocketCommunicationManager:
             'data': request_object
         }
 
-        # reset previous responce
-        self.__websocket_response = None
+        self.response_data = None
 
-        await self.__websocket.send(json.dumps(send_obj))
+        with self.request_lock:
+            self.request_data = send_obj
 
-        # waits for responce
-        while self.__websocket_response is None:
-            await asyncio.sleep(SLEEP_TIME)
+        self.response_event.clear()
+        self.response_event.wait()
 
         # return the response.
-        return json.loads(self.__websocket_response)
+        return self.response_data
 
     # send a command to the robot which isn't supposed to return data
-    async def __send_command(self, request_object):
+    def __send_command(self, request_object):
         # emit the command.
-
-        if not self.__websocket:
-            print('Waiting for client connection')
-
-        # wait till one client connects
-        while (not self.__websocket):
-            await asyncio.sleep(SLEEP_TIME)
-
         send_obj = {
             'message': 'control vehicle IDE',
             'data': request_object
         }
-
-        await self.__websocket.send(json.dumps(send_obj))
-
+        with self.request_lock:
+            self.request_data = send_obj
+        self.command_event.clear()
+        self.command_event.wait()
+        
     async def __load_configurations(self):
         ''' Clear the event variable to open up for later responses. '''
-
-        if not self.__websocket:
-            print('Waiting for client connection')
-
-        # wait till one client connects
-        while (not self.__websocket):
-            await asyncio.sleep(SLEEP_TIME)
 
         '''
         Emit the request and wait for a response
@@ -164,18 +147,16 @@ class WebsocketCommunicationManager:
             'message': 'load configurations'
         }
 
-        # reset previous responce
-        self.__websocket_response = None
+        self.response_data = None
 
-        await self.__websocket.send(json.dumps(send_obj))
+        with self.request_lock:
+            self.request_data = send_obj
 
-        print('Waiting for client responce')
-        # waits for responce
-        while self.__websocket_response is None:
-            await asyncio.sleep(SLEEP_TIME)
+        self.response_event.clear()
+        self.response_event.wait()
 
         # return the response.
-        return self.__websocket_response
+        return self.response_data
 
     def get_configurations(self):
         return self.__configuration
@@ -183,29 +164,10 @@ class WebsocketCommunicationManager:
     def start(self):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-
         start_server = websockets.serve(
             self.ws_server, "localhost", 25842, ssl=ssl_context)
-        self.__websocket_server = loop.run_until_complete(start_server)
-
-        # loop.run_forever()
-        try:
-            while True:
-                if self.stopped():
-                    print('stopped!!!!')
-                    break
-                loop.run_until_complete(asyncio.sleep(SLEEP_TIME))
-        finally:
-            if self.__websocket:
-                loop.run_until_complete(self.__websocket.close(
-                    code=1002, reason='force close from server'))
-
-            if self.__websocket_server:
-                self.__websocket_server.close()
-                loop.run_until_complete(self.__websocket_server.wait_closed())
-
-            loop.close()
-            print('done')
+        loop.run_until_complete(start_server)
+        loop.run_forever()
 
     def stopped(self):
         return self._stop.isSet()
@@ -222,29 +184,5 @@ class WebsocketCommunicationManager:
 
     def stop(self):
         self._stop.set()
-
-        '''
-        if self.__websocket_server:
-            print('...closing server')
-
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-            if self.__websocket:
-                loop.run_until_complete(self.__websocket.close(
-                    code=1002, reason='force close from server'))
-
-            self.__websocket_server.close()
-
-            loop.run_until_complete(self.__websocket_server.wait_closed())
-
-
-
-        self.__websocket = None
-        self.__websocket = None
-        self.__websocket_server = None
-        self.__websocket_response = None
-
-        '''
 
         print("Server closed")

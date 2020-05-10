@@ -19,10 +19,9 @@ class Robot:
         self.thread = Thread(target=self.__communication_manager.start)
         self.thread.start()
 
-        self.__communication_manager.get_configuration()
-
         ready_event.wait()
 
+        self.__communication_manager.get_configuration()
         self.__configuration = self.__communication_manager.get_configurations()
 
         # if it is required to wait for a green light from the server in order to run the code, wait.
