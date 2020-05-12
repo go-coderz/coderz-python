@@ -5,7 +5,7 @@ import time
 import json
 import websockets
 import threading
-
+import sys
 
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 localhost_pem = pathlib.Path(__file__).with_name("file.pem")
@@ -22,14 +22,10 @@ class WebsocketCommunicationManager:
         # save a copy of the configuration for later use.
         self.response_data = None
 
-        self._stop = threading.Event()
-
         self.ready = ready
 
         self.request_lock = threading.Lock()
-        self.response_lock = threading.Lock()
 
-        self.request_event = threading.Event()
         self.response_event = threading.Event()
         self.response_event.set()
         self.command_event = threading.Event()
@@ -38,8 +34,15 @@ class WebsocketCommunicationManager:
         self.request_data = None
         self.response_data = None
 
+        self.interrupt_event = threading.Event()
+    
     async def ws_server(self, websocket, path):
+
         while True:
+            if self.interrupt_event.is_set():
+                print("Server interrupted")
+                break
+
             await asyncio.sleep(SLEEP_TIME)
             if not self.ready.is_set():
                 self.ready.set()
@@ -54,7 +57,6 @@ class WebsocketCommunicationManager:
             if not self.response_event.is_set():
                 message = await websocket.recv()
                 self.wait_response(message)
-
 
     def wait_response(self, message):
         jsonLoaded = json.loads(message)
@@ -166,11 +168,13 @@ class WebsocketCommunicationManager:
         asyncio.set_event_loop(loop)
         start_server = websockets.serve(
             self.ws_server, "localhost", 25842, ssl=ssl_context)
-        loop.run_until_complete(start_server)
-        loop.run_forever()
 
-    def stopped(self):
-        return self._stop.isSet()
+        websocket_server = loop.run_until_complete(start_server)
+        
+        while True:
+            loop.run_until_complete(asyncio.sleep(1))
+            if self.interrupt_event.is_set():
+                break
 
     def get_configuration(self):
         loop = asyncio.new_event_loop()
@@ -183,6 +187,4 @@ class WebsocketCommunicationManager:
         loop.close()
 
     def stop(self):
-        self._stop.set()
-
-        print("Server closed")
+        self.interrupt_event.set()
