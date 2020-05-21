@@ -1,16 +1,10 @@
 from .robot import Robot
-from signal import SIGTERM, SIGINT, SIGHUP, signal
-import sys
 
 conf = {
     "communication": {
         "communication_manager_type": "ide"
     }
 }
-
-def interrupt_handler(signum, frame):
-    Server.stop()
-    sys.exit()
 
 class Server():
     _is_server_started = False
@@ -22,10 +16,6 @@ class Server():
         if Server._is_server_started:
             print('Server already started')
             return
-
-        signal(SIGTERM, interrupt_handler)
-        signal(SIGINT, interrupt_handler)
-        signal(SIGHUP, interrupt_handler)
 
         Server._robot = Robot(conf)
         Server._is_server_started = True
