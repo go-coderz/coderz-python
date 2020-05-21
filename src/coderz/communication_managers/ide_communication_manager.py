@@ -136,32 +136,6 @@ class WebsocketCommunicationManager:
             self.request_data = send_obj
         self.command_event.clear()
         self.command_event.wait()
-        
-    async def __load_configurations(self):
-        ''' Clear the event variable to open up for later responses. '''
-
-        '''
-        Emit the request and wait for a response
-        (A.K.A a self.__event.set() somewhere in the code)
-        '''
-
-        send_obj = {
-            'message': 'load configurations'
-        }
-
-        self.response_data = None
-
-        with self.request_lock:
-            self.request_data = send_obj
-
-        self.response_event.clear()
-        self.response_event.wait()
-
-        # return the response.
-        return self.response_data
-
-    def get_configurations(self):
-        return self.__configuration
 
     def start(self):
         loop = asyncio.new_event_loop()
@@ -177,14 +151,21 @@ class WebsocketCommunicationManager:
                 break
 
     def get_configuration(self):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
         ''' This is blocking all I/O 🐒 '''
-        self.__configuration = loop.run_until_complete(
-            self.__load_configurations())
-        self.ready.set()
-        loop.close()
+        send_obj = {
+            'message': 'load configurations'
+        }
+
+        self.response_data = None
+
+        with self.request_lock:
+            self.request_data = send_obj
+
+        self.response_event.clear()
+        self.response_event.wait()
+
+        # return the response.
+        return self.response_data
 
     def stop(self):
         self.interrupt_event.set()
