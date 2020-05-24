@@ -50,6 +50,7 @@ class WebsocketCommunicationManager:
             with self.request_lock:
                 if self.request_data != None:
                     await websocket.send(json.dumps(self.request_data))
+                    self.request_data = None
 
                     if not self.command_event.is_set():
                         self.command_event.set()
