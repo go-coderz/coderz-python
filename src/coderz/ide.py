@@ -1,5 +1,7 @@
 from .robot import Robot
+import requests
 
+certificate_url = 'https://coderz-public-files.s3.amazonaws.com/certificates/local.gocoderz.com/file.pem'
 conf = {
     "communication": {
         "communication_manager_type": "ide"
@@ -18,6 +20,9 @@ class Server():
             print('Server already started')
             return
 
+        certificate_obj = requests.get(certificate_url)
+        with open('coderz/communication_managers/file.pem', 'w') as pem_file:
+            pem_file.write(certificate_obj.text)
         Server._robot = Robot(conf)
         Server._is_server_started = True
         Server._robot.print_manual()
