@@ -5,7 +5,7 @@ with open("Readme.md", "r") as fh:
     long_description = fh.read()
 setuptools.setup(
     name='coderz',
-    version='0.1.15',
+    version='0.1.16',
     author="CoderZ",
     author_email="app@gocoderz.com",
     python_requires='>3.0',
@@ -16,7 +16,8 @@ setuptools.setup(
     install_requires=[
     'websockets>=7.0',
     'python-socketio==4.0.2',
-    'aiohttp>=3.0.0'
+    'aiohttp>=3.0.0',
+    'requests>=2.22.0'
     ],
     packages=setuptools.find_packages(where='src'),
     package_dir={'': 'src'},
